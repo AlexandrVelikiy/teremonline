@@ -111,7 +111,7 @@ class SharangroupSpider(scrapy.Spider):
                 self.brand = charact_value_t[i]
             a = '|'.join([haract, atributes_name_list[i], charact_value_t[i]])
             atribute = atribute + a + '\n'
-        return atribute
+        return atribute.strip('\n')
 
     def processing_img_urls(self,urls):
         # обрабатываем список уклов

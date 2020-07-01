@@ -53,12 +53,15 @@ class TeremonlineScrItem(scrapy.Item):
     _DOCUMENTS_ = scrapy.Field()
     _URL_ = scrapy.Field()
 
+def serialize_model1(value):
+    return f"`{value}"
+
 class SharangroupScrItem(scrapy.Item):
     # define the fields for your item here like:
     _MAIN_CATEGORY_ = scrapy.Field()
     _NAME_ = scrapy.Field()
-    _MODEL_ = scrapy.Field()
-    _SKU_ = scrapy.Field()
+    _MODEL_ = scrapy.Field(serializer=serialize_model1)
+    _SKU_ = scrapy.Field(serializer=serialize_model1)
     _MANUFACTURER_ = scrapy.Field()
     _PRICE_ = scrapy.Field(serializer=serialize_price2)
     _UNIT_ = scrapy.Field()

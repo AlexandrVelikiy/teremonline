@@ -114,7 +114,7 @@ class TermorosSpider(scrapy.Spider):
         for i in range(len(name)):
             a = '|'.join([haract, name[i], znach[i]])
             atribute = atribute + a + '\n'
-        return atribute
+        return atribute.strip('\n')
 
     def processing_img_urls(self,urls):
         # обрабатываем список уклов

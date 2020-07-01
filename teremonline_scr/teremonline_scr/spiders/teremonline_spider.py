@@ -132,7 +132,7 @@ class TeremonlineSpider(scrapy.Spider):
                 pass
             a = '|'.join([sced_list_cat, charact_name[i], charact_value_t[i]])
             atribute = atribute + a + '\n'
-        return atribute
+        return atribute.strip('\n')
 
     def processing_img_urls(self,urls):
         # обрабатываем список уклов удаляя лишнее
