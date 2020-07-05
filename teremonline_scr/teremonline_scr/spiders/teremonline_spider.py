@@ -42,7 +42,7 @@ class TeremonlineSpider(scrapy.Spider):
         urls = response.xpath('.//div[@ itemtype="http://schema.org/Product"]/a/@href').extract()
 
         for url in urls:
-            yield scrapy.Request(url='https://www.teremonline.ru'+url, cb_kwargs = dict(category_name = category_name),callback=self.parse_item)
+            yield scrapy.Request(url='https://www.teremonline.ru'+url, cb_kwargs = dict(category_name = category_name), callback=self.parse_item)
 
 
     def parse_item(self, response, category_name):

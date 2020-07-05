@@ -12,8 +12,9 @@ BOT_NAME = 'teremonline_scr'
 SPIDER_MODULES = ['teremonline_scr.spiders']
 NEWSPIDER_MODULE = 'teremonline_scr.spiders'
 
-LOG_LEVEL = 'INFO'
-LOG_FILE = 'log.txt'
+#LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
+#LOG_FILE = 'log.txt'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'teremonline_scr (+http://www.yourdomain.com)'

@@ -99,3 +99,60 @@ class TermorosScrItem(scrapy.Item):
     _DESCRIPTION_ = scrapy.Field(serializer=serialize_descr)
     _DOCUMENTS_ = scrapy.Field()
     _URL_ = scrapy.Field()
+
+def serialize_descr(value):
+    # удаляем всю информацию по данному изделию уточняйте по телефону ...
+    in_s = str(value)
+    in_s = in_s.strip()
+    i = in_s.find('всю информацию по данному изделию уточняйте по телефону')
+    if i > -1:
+        in_s = in_s[:i]
+    else:
+        i = in_s.find('Оптовый отдел')
+        if i > -1:
+            in_s = in_s[:i]
+    return in_s
+
+def serializer_peice3(value):
+    in_s = str(value)
+    in_s = in_s.strip()
+    i = in_s.find('руб.')
+    if i > -1:
+        in_s = in_s[:i]
+    return in_s
+
+class MargroidScrItem(scrapy.Item):
+    # define the fields for your item here like:
+    _MAIN_CATEGORY_ = scrapy.Field()
+    _NAME_ = scrapy.Field()
+    _MODEL_ = scrapy.Field()
+    _SKU_ = scrapy.Field()
+    _MANUFACTURER_ = scrapy.Field()
+    _PRICE_ = scrapy.Field(serializer=serializer_peice3)
+    _UNIT_ = scrapy.Field()
+    _ATTRIBUTES_ = scrapy.Field()
+    _IMAGE_ = scrapy.Field()
+    _IMAGES_ = scrapy.Field()
+    _DESCRIPTION_ = scrapy.Field(serializer=serialize_descr)
+    _DOCUMENTS_ = scrapy.Field()
+    _URL_ = scrapy.Field()
+
+#---------------------------------------
+def serialize_model_f(value):
+    return f"`{value}"
+
+class FamarketScrItem(scrapy.Item):
+    # define the fields for your item here like:
+    _MAIN_CATEGORY_ = scrapy.Field()
+    _NAME_ = scrapy.Field()
+    _MODEL_ = scrapy.Field(serializer= serialize_model_f)
+    _SKU_ = scrapy.Field(serializer= serialize_model_f)
+    _MANUFACTURER_ = scrapy.Field()
+    _PRICE_ = scrapy.Field()
+    _UNIT_ = scrapy.Field()
+    _ATTRIBUTES_ = scrapy.Field()
+    _IMAGE_ = scrapy.Field()
+    _IMAGES_ = scrapy.Field()
+    _DESCRIPTION_ = scrapy.Field()
+    _DOCUMENTS_ = scrapy.Field()
+    _URL_ = scrapy.Field()
