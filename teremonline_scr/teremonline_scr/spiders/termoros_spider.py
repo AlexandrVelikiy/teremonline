@@ -29,8 +29,6 @@ class TermorosSpider(scrapy.Spider):
             for i in range(count_page):
                 url = response.url + f'?PAGEN_4={i+1}'
                 yield scrapy.Request(url=url ,callback=self.parse)
-                if i > 10:
-                    break
 
         else:
             # одна страница
