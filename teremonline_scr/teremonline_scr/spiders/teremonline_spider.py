@@ -76,7 +76,8 @@ class TeremonlineSpider(scrapy.Spider):
                 # тут несколько разделов
                 atribute = ''
                 for i in range(len(sced_list)):
-                    atribute = atribute + self.get_atributes(sced_list[i],'Характеристики')
+                    atribute = atribute + self.get_atributes(sced_list[i],'Характеристики') + '\n'
+                atribute = atribute.strip('\n')
             else:
                 # тут один раздел
                 atribute = self.get_atributes(sced_list[0], 'Характеристики')

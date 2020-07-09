@@ -152,16 +152,20 @@ class MargroidSpider(scrapy.Spider):
 
     def processing_img_urls(self,urls):
         # обрабатываем список уклов
+        #https://www.margroid.ru/upload/resize_cache/iblock/4e2/202_170_1/heater_Brushed_gold_B97.jpg
+        #https://www.margroid.ru/upload/iblock/4e2/heater_Brushed_gold_B97.jpg
         if urls:
-            if len(urls) > 1:
-                new_urls = []
-                for url in urls:
-                    new_url = 'https://www.margroid.ru' + url
-                    new_urls.append(new_url)
-                new_url = new_urls.pop(0)
-            else:
-                new_url = 'https://www.margroid.ru' + urls[0]
-                new_urls = ''
+            new_urls = []
+            for url in urls:
+                split_urls = url.split('/')
+                if len(split_urls) > 5:
+                    del (split_urls[2])
+                    del (split_urls[4])
+                split_urls[0] = 'https://www.margroid.ru'
+                new_url = '/'.join(split_urls)
+                #new_url = 'https://www.margroid.ru' + url
+                new_urls.append(new_url)
+            new_url = new_urls.pop(0)
         else:
             new_url = ''
             new_urls = ''
