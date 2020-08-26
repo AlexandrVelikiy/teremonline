@@ -139,7 +139,7 @@ class MargroidScrItem(scrapy.Item):
 
 #---------------------------------------
 def serialize_model_f(value):
-    return f"`{value}"
+    return f"{value}"
 
 class FamarketScrItem(scrapy.Item):
     # define the fields for your item here like:
@@ -149,6 +149,58 @@ class FamarketScrItem(scrapy.Item):
     _SKU_ = scrapy.Field(serializer= serialize_model_f)
     _MANUFACTURER_ = scrapy.Field()
     _PRICE_ = scrapy.Field()
+    _UNIT_ = scrapy.Field()
+    _ATTRIBUTES_ = scrapy.Field()
+    _IMAGE_ = scrapy.Field()
+    _IMAGES_ = scrapy.Field()
+    _DESCRIPTION_ = scrapy.Field()
+    _DOCUMENTS_ = scrapy.Field()
+    _URL_ = scrapy.Field()
+
+
+#---------
+
+def serialize_model2(value):
+    # удаляем Артикул:
+    in_s = str(value)
+    s = in_s[in_s.find(':')+2:]
+    return f"`{s}"
+
+
+class SantehgradItem(scrapy.Item):
+    # define the fields for your item here like:
+    _MAIN_CATEGORY_ = scrapy.Field()
+    _NAME_ = scrapy.Field()
+    _MODEL_ = scrapy.Field(serializer=serialize_model2)
+    _SKU_ = scrapy.Field(serializer=serialize_model2)
+    _MANUFACTURER_ = scrapy.Field()
+    _PRICE_ = scrapy.Field()
+    _UNIT_ = scrapy.Field()
+    _ATTRIBUTES_ = scrapy.Field()
+    _IMAGE_ = scrapy.Field()
+    _IMAGES_ = scrapy.Field()
+    _DESCRIPTION_ = scrapy.Field()
+    _DOCUMENTS_ = scrapy.Field()
+    _URL_ = scrapy.Field()
+
+
+def serialize_price_steklo(value):
+    # удаляем знак рубля
+    res = ''
+    try:
+        res = value[:len(value) - 4]
+    except:
+        pass
+    return res
+
+class StekloCarItem(scrapy.Item):
+    # define the fields for your item here like:
+    _MAIN_CATEGORY_ = scrapy.Field()
+    _NAME_ = scrapy.Field()
+    _MODEL_ = scrapy.Field()
+    _SKU_ = scrapy.Field()
+    _MANUFACTURER_ = scrapy.Field()
+    _PRICE_ = scrapy.Field(serializer=serialize_price_steklo)
     _UNIT_ = scrapy.Field()
     _ATTRIBUTES_ = scrapy.Field()
     _IMAGE_ = scrapy.Field()

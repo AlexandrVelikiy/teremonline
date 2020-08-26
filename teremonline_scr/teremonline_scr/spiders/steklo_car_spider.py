@@ -1,9 +1,9 @@
 import scrapy
-from teremonline_scr.items import FamarketScrItem
+from teremonline_scr.items import StekloCarItem
 import os
 
-class FamarketSpider(scrapy.Spider):
-    name = "famarket_scr"
+class StekloCarSpider(scrapy.Spider):
+    name = "steklo_car_scr"
 
     def start_requests(self):
         urls = []
@@ -19,35 +19,31 @@ class FamarketSpider(scrapy.Spider):
                 'dont_redirect': True,
                 'handle_httpstatus_list': [302]}, callback=self.parse)
 
-    def parse_pages(self,response):
+    def parse(self,response):
         # определеяем количество страниц
-        url = response.url + f'?page=1'
-        yield scrapy.Request(url=url, callback=self.parse)
+        # https://steklo-car.ru
+        # ('.//div [@id="cat_top_tree"]/table/tbody/tr/td//a/@href')
+        urls = response.xpath('.//div [@id="cat_top_tree"]//table//a/@href').extract()
+        for url in urls:
+            yield scrapy.Request(url='https://steklo-car.ru' + url + 'all/', callback=self.parse_model_auto)
 
 
-    def parse(self, response):
+
+    def parse_model_auto(self, response):
         if not response.xpath('.//h1').get():
             yield scrapy.Request(url=response.url, dont_filter=True)
 
-        # определяем есть ли ссылки дальше, свяряем текущую ссылку и ту что в "следующая"
-        plaginate = response.xpath('.//ul [@class="pagination"]/li/a/@href').extract()
-        if plaginate:
-            next_page_url = 'https://famarket.ru'+ plaginate[-1]
-            if response.url != next_page_url:
-                yield scrapy.Request(url= next_page_url,  callback=self.parse)
-
-        category_name = response.xpath('.//h1/text()').get()
-        urls = response.xpath('.//div [@class="template-product-list"]//h5[@class="product-name"]/a/@href').extract()
+        urls = response.xpath('.//div [@class="prdbrief_name"]/a/@href').extract()
 
         for url in urls:
-            yield scrapy.Request(url='https://famarket.ru' + url, cb_kwargs = dict(category_name = category_name), callback=self.parse_item)
+            yield scrapy.Request(url='https://steklo-car.ru' + url, callback=self.parse_item)
 
 
-    def parse_item(self, response, category_name):
-        items = FamarketScrItem()
+    def parse_item(self, response):
+        items = StekloCarItem()
         self.brand = ''
 
-        category_path = response.xpath('.//ol [@class="breadcrumb"]/li/a/span/text()').extract()
+        category_path = response.xpath('.//div[@class="cpt_product_category_info"]/table/tr/td/a/text()').extract()
         if len(category_path) > 2:
             # удалим 1 лишние
             category_path.pop(0)
@@ -55,14 +51,14 @@ class FamarketSpider(scrapy.Spider):
         else:
             main_category ='|'.join(category_path)
 
-        name = response.xpath('.//h1[@itemprop="name"]/text()').get()
+        name = response.xpath('.//h1/text()').get()
 
-        price  = response.xpath('.//span[@class="new-price priceService"]/text()').get()
+        price  = response.xpath('.//div [@class="cpt_product_price"]//span/text()').get()
         unit = ''
         model = ''#response.xpath('.//div [@ class="small"]/text()').get()
-        self.brand = response.xpath('.//div [@class="product-manufacturer-logo-block brand-url"]/a/img/@alt').get()
+        self.brand = ''
 
-        chracter_list  = response.xpath('.//div [@id="setting"]//table/tr/td')
+        chracter_list  = response.xpath('.//div [@class="cpt_product_params_fixed"]/table/tr/td')
         if len(chracter_list) > 0:
             # обрабатываем характетристики
             atribute = self.get_atributes('Характеристики',chracter_list)
@@ -71,11 +67,12 @@ class FamarketSpider(scrapy.Spider):
             atribute = ''
 
         # нужно обработать убрав лишнее
-        list_img_urls = response.xpath('.//div [@id="productSlider"]//img/@src').extract()
+        list_img_urls = response.xpath('.//div [@class="cpt_product_images"]//img/@src').extract()
         if len(list_img_urls) == 1:
-            images_url = 'https://famarket.ru' + list_img_urls[0]
+            images_url = 'https://steklo-car.ru' + list_img_urls[0]
             images_urls = ''
         else:
+            # убрать
             list_img_urls = response.xpath('.//div [@id="productSlider"]//img[@data-elem="bg"]/@src').extract()
             images_url, images_urls = self.processing_img_urls(list_img_urls)
         #if list_img_urls:
@@ -86,10 +83,12 @@ class FamarketSpider(scrapy.Spider):
         #    images_urls = ''
 
         #descriptions = response.xpath('//div [@id="desc"]//text()').extract()
-        descriptions = response.xpath('//div [@id="desc"]/node()').extract()
-        description = ''
-        for d in descriptions:
-            description = description + ' ' + d
+        descriptions = response.xpath('.//table[@class="tovar-info"]/tbody/tr[@class="tovar-info-shema"]/td/text()').extract()
+        if len(descriptions) >0 :
+            description = descriptions[0].strip()
+        else:
+            description = ''
+
 
         items['_MAIN_CATEGORY_'] = main_category
         items['_NAME_'] =  name
@@ -112,21 +111,18 @@ class FamarketSpider(scrapy.Spider):
         name = []
         znach = []
         for i, value in enumerate(atributes_name_list):
-            v = value.xpath('descendant-or-self::*/text()').get()
+            v = value.xpath('b/text()').get()
             if not v:
                 v = value.xpath('text()').get()
             if not v:
                 v = ''
             if (i + 1) % 2:
-                name.append(v)
+                name.append(v.strip())
             else:
-                znach.append(v)
+                znach.append(v.strip())
 
         atribute = ''
         for i in range(len(name)):
-            if name[i] == 'Бренд' or name[i] == 'Производитель':
-                self.brand = znach[i]
-
             a = '|'.join([haract, name[i], znach[i]])
             atribute = atribute + a + '\n'
         return atribute.strip('\n')
